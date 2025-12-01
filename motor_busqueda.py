@@ -2,7 +2,7 @@ import os
 
 INDEX_PATH="index/"
 
-def load_index():
+def cargar_indice():
     index={}
     for filename in os.listdir(INDEX_PATH):
         if filename.endswith(".txt"):
@@ -11,21 +11,21 @@ def load_index():
                 index[word]=set(line.strip() for line in f if line.strip())
     return index
 
-def intersect_recursive(list_of_sets):
+def intersectar_recursivo(list_of_sets):
     if not list_of_sets: return set()
     if len(list_of_sets)==1: return list_of_sets[0]
-    return list_of_sets[0].intersection(intersect_recursive(list_of_sets[1:]))
+    return list_of_sets[0].intersection(intersectar_recursivo(list_of_sets[1:]))
 
-def search(q,index):
+def buscar(q,index):
     words=q.lower().split()
     posting=[]
     for w in words:
         posting.append(index.get(w,set()))
-    return intersect_recursive(posting)
+    return intersectar_recursivo(posting)
 
 if __name__=="__main__":
-    index=load_index()
+    index=cargar_indice()
     while True:
         q=input("consulta: ")
         if q=="salir": break
-        print(search(q,index))
+        print(buscar(q,index))

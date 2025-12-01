@@ -5,12 +5,12 @@ import re
 CSV_PATH = "videoGames.csv"
 OUTPUT_DIR = "data"
 
-def slugify(text):
-    text = text.lower()
-    text = re.sub(r'[^a-z0-9]+', '_', text)
-    return text.strip('_')[:40]
+def generar_slug(texto):
+    texto = texto.lower()
+    texto = re.sub(r"[^a-z0-9]+", "_", texto)
+    return texto.strip("_")[:40]
 
-def main():
+def principal():
     df = pd.read_csv(CSV_PATH)
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     for i, row in df.iterrows():
@@ -19,9 +19,9 @@ def main():
         if desc=="nan":
             desc=""
         rank=int(row["rank"])
-        filename=f"{rank:03d}_{slugify(name)}.txt"
+        filename=f"{rank:03d}_{generar_slug(name)}.txt"
         with open(os.path.join(OUTPUT_DIR, filename),"w",encoding="utf-8") as f:
             f.write(desc)
 
 if __name__=="__main__":
-    main()
+    principal()
