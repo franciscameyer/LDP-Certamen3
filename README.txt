@@ -1,98 +1,89 @@
-Certamen 3 – Índice Invertido
-=============================
+Certamen 3 - Motor de búsqueda con índice invertido
+===================================================
 
-INTEGRANTES
+Integrantes
 -----------
 - Francisca Meyer
 - Lukas Scheel
 
-DESCRIPCIÓN GENERAL
--------------------
-Este proyecto implementa un **motor de búsqueda** basado en un **ÍNDICE INVERTIDO** a partir de un dataset de videojuegos
-(obtenido desde Kaggle: https://www.kaggle.com/datasets/kaavyamahajan/video-games-plots). La idea es:
+Resumen
+-------
+Motor de búsqueda en línea de comandos que construye un índice invertido a partir del dataset `videoGames.csv` (Kaggle). El flujo completo:
 
-1. Convertir el CSV en múltiples archivos `.txt` (un documento por videojuego).
-2. Eliminar las *stopwords* usando **recursividad** en Python.
-3. Construir un índice invertido usando **AWK**, generando un archivo por palabra.
-4. Cargar el índice en memoria y procesar consultas de búsqueda en Python, usando **intersección recursiva** de listas de posteo.
+1) Convertir el CSV en un `.txt` por videojuego.  
+2) Eliminar *stopwords* con una función recursiva en Python.  
+3) Crear un archivo de postings por palabra con AWK.  
+4) Atender consultas multi-palabra en Python intersectando recursivamente las listas de documentos.
 
-
-
-REPOSITORIO GIT
----------------
-Repositorio del proyecto (Git):
-
-    https://github.com/franciscameyer/LDP-Certamen3
-
-
-
-ESTRUCTURA DEL PROYECTO
-------------------------
-Archivos principales:
-
-- `preparar_dataset.py`  
-  Convierte el archivo `videoGames.csv` en múltiples documentos `.txt` dentro de la carpeta `data/`.
-  Cada archivo contiene la descripción del videojuego. :contentReference[oaicite:6]{index=6}
-
-- `eliminar_stopwords.py`  
-  Elimina *stopwords* de los documentos usando una función **recursiva**
-  (`eliminar_stopwords_recursivo`). Además, durante la ejecución **muestra por consola**
-  las stopwords eliminadas en cada línea. :contentReference[oaicite:7]{index=7}
-
-- `stopwords.txt`  
-  Lista de palabras vacías (*stopwords*) en inglés que se desean eliminar del índice
-  (artículos, preposiciones, pronombres, etc.). :contentReference[oaicite:8]{index=8}
-
-- `build_index.awk`  
-  Script AWK que construye el **índice invertido** a partir de los archivos sin stopwords
-  (`data_clean/`). Para cada palabra crea un archivo `index/<palabra>.txt` que contiene
-  la lista de documentos donde aparece esa palabra.
-
-- `motor_busqueda.py`  
-  Carga en memoria el índice invertido desde la carpeta `index/` y permite hacer consultas
-  de múltiples palabras. La intersección de las listas de documentos se realiza de forma
-  **recursiva** mediante la función `intersectar_recursivo`. :contentReference[oaicite:9]{index=9}
-
-- `Makefile`  
-  Automatiza la ejecución de los pasos anteriores mediante las reglas `prepare`, `clean_data`,
-  `index`, `run` y `clean`. :contentReference[oaicite:10]{index=10}
-
-- `videoGames.csv`  
-  Dataset original (Kaggle) con información de videojuegos (nombre, descripción, ranking, etc.).
-
-REQUISITOS
+Requisitos
 ----------
-- Python 3 instalado (`python` o `py`).
-- AWK (por ejemplo, el que viene con Git Bash en Windows).
-- `make` (por ejemplo, el que viene con Git/Git Bash).
+- Python 3 y `pip` (se usa `pandas`).
+- AWK (el que incluye Git Bash funciona).
+- `make` (también viene con Git Bash en Windows).
 
-USO (PASO A PASO)
+Instalación rápida
+------------------
+- Instala dependencias de Python: `python -m pip install pandas`
+- En Windows usa Git Bash para que `make` y `awk` estén disponibles en PATH.
+
+Uso recomendado con make
+------------------------
+```bash
+make prepare      # Genera data/*.txt desde videoGames.csv
+make clean_data   # Limpia stopwords recursivamente -> data_clean/
+make index        # Construye el índice invertido en index/
+make run          # Inicia el buscador interactivo (escribe "salir" para terminar)
+# make clean      # (opcional) elimina data_clean/ e index/
+```
+
+Ejecución manual (sin make)
+---------------------------
+```bash
+python preparar_dataset.py
+mkdir -p data_clean
+for f in data/*.txt; do python eliminar_stopwords.py "$f" "data_clean/$(basename "$f")"; done
+mkdir -p index
+awk -f build_index.awk data_clean/*.txt
+python motor_busqueda.py
+```
+
+Formato de las consultas
+------------------------
+- La búsqueda es por intersección (AND): solo retorna documentos que contienen **todas** las palabras.
+- Las palabras se normalizan a minúsculas y se ignoran stopwords.
+- En la sesión interactiva usa `salir` para cerrar.
+- La salida muestra el conjunto de archivos `data_clean/<rank>_<slug>.txt` donde aparece cada término.
+
+Estructura esperada
+-------------------
+```
+videoGames.csv
+data/             # .txt originales (1 por juego)
+data_clean/       # .txt sin stopwords
+index/            # <palabra>.txt con la lista de documentos donde aparece
+build_index.awk
+eliminar_stopwords.py
+motor_busqueda.py
+preparar_dataset.py
+stopwords.txt
+Makefile
+```
+
+Archivos y decisiones clave
+---------------------------
+- `preparar_dataset.py`: usa `pandas` para leer el CSV y crear un `.txt` por juego con un nombre limpio (`rank_slug`).
+- `eliminar_stopwords.py`: función recursiva `eliminar_stopwords_recursivo` que además imprime en consola las stopwords removidas por línea.
+- `build_index.awk`: genera un archivo por palabra en `index/` con los documentos donde aparece, omitiendo stopwords.
+- `motor_busqueda.py`: carga todos los postings en memoria y resuelve la consulta intersectando las listas de forma recursiva.
+- `Makefile`: automatiza todo el pipeline (`prepare`, `clean_data`, `index`, `run`, `clean`).
+
+Problemas comunes
 -----------------
+- `awk` o `make` no encontrados: abre Git Bash o instala una distribución Unix-like para Windows.
+- `ModuleNotFoundError: pandas`: instala con `python -m pip install pandas`.
+- Texto extraño en consola: asegúrate de guardar los `.py` y `.txt` en UTF-8 y ejecutar en una terminal que soporte ese encoding.
 
-> Recomendación: en Windows usar **Git Bash** para ejecutar estos comandos.
-
-1. Generar documentos `.txt` desde el CSV
-
-    ```bash
-    make prepare
-    ```
-
-   - Entrada: `videoGames.csv` (dataset de videojuegos).
-   - Salida: múltiples archivos `.txt` en la carpeta `data/`
-     con la descripción de cada videojuego. :contentReference[oaicite:11]{index=11}
-
-2. Eliminar stopwords (con recursividad y mensajes en consola)
-
-    ```bash
-    make clean_data
-    ```
-
-   - Entrada: archivos `data/*.txt`.
-   - Proceso:
-     - Para cada línea del archivo, se aplican:
-       - `eliminar_stopwords_recursivo(words, removed)` → función recursiva.
-       - Se imprimen por consola las stopwords removidas en esa línea.
-   - Salida: archivos limpios en la carpeta `data_clean/`.
-
-   Ejemplo de mensaje en consola (salida aproximada):
-
+Enlaces (Links)
+-----------------
+- CSV: https://www.kaggle.com/datasets/kaavyamahajan/video-games-plots
+- Repositorio github: https://github.com/franciscameyer/LDP-Certamen3
