@@ -2,6 +2,7 @@ import sys, os
 
 stopwords=set(line.strip() for line in open("stopwords.txt",encoding="utf-8") if line.strip())
 
+# Elimina stopwords de forma recursiva y acumula las removidas
 def eliminar_stopwords_recursivo(words, removed=None):
     if removed is None: removed=[]
     if not words: return [], removed
@@ -12,6 +13,7 @@ def eliminar_stopwords_recursivo(words, removed=None):
     cleaned_rest, removed = eliminar_stopwords_recursivo(rest, removed)
     return [first]+cleaned_rest, removed
 
+# Procesa un archivo, eliminando stopwords de cada linea
 def procesar_archivo(input_path, output_path):
     with open(input_path,"r",encoding="utf-8") as f:
         lines=f.readlines()
