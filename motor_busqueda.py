@@ -2,6 +2,7 @@ import os
 
 INDEX_PATH="index/"
 
+# Carga en memoria el indice invertido generado por AWK.
 def cargar_indice():
     index={}
     for filename in os.listdir(INDEX_PATH):
@@ -11,11 +12,13 @@ def cargar_indice():
                 index[word]=set(line.strip() for line in f if line.strip())
     return index
 
+# Intersecta recursivamente las listas de documentos para cada palabra.
 def intersectar_recursivo(list_of_sets):
     if not list_of_sets: return set()
     if len(list_of_sets)==1: return list_of_sets[0]
     return list_of_sets[0].intersection(intersectar_recursivo(list_of_sets[1:]))
 
+# Procesa la consulta, obtiene los postings y devuelve su interseccion.
 def buscar(q,index):
     words=q.lower().split()
     posting=[]

@@ -5,11 +5,13 @@ import re
 CSV_PATH = "videoGames.csv"
 OUTPUT_DIR = "data"
 
+# Genera un identificador corto y limpio para nombres de archivo.
 def generar_slug(texto):
     texto = texto.lower()
     texto = re.sub(r"[^a-z0-9]+", "_", texto)
     return texto.strip("_")[:40]
 
+# Recorre el CSV y crea archivos .txt con las descripciones de cada juego.
 def principal():
     df = pd.read_csv(CSV_PATH)
     os.makedirs(OUTPUT_DIR, exist_ok=True)

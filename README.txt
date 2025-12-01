@@ -9,14 +9,14 @@ INTEGRANTES
 DESCRIPCIÓN GENERAL
 -------------------
 Este proyecto implementa un **motor de búsqueda** basado en un **ÍNDICE INVERTIDO** a partir de un dataset de videojuegos
-(obtenido desde Kaggle). La idea es:
+(obtenido desde Kaggle: https://www.kaggle.com/datasets/kaavyamahajan/video-games-plots). La idea es:
 
 1. Convertir el CSV en múltiples archivos `.txt` (un documento por videojuego).
 2. Eliminar las *stopwords* usando **recursividad** en Python.
 3. Construir un índice invertido usando **AWK**, generando un archivo por palabra.
 4. Cargar el índice en memoria y procesar consultas de búsqueda en Python, usando **intersección recursiva** de listas de posteo.
 
-El proyecto cumple con los requisitos del enunciado del Certamen 3. :contentReference[oaicite:5]{index=5}
+
 
 REPOSITORIO GIT
 ---------------
@@ -24,7 +24,7 @@ Repositorio del proyecto (Git):
 
     https://github.com/franciscameyer/LDP-Certamen3
 
-(Actualizar con el enlace real del repositorio.)
+
 
 ESTRUCTURA DEL PROYECTO
 ------------------------
